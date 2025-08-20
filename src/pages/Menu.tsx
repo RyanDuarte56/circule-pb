@@ -1,10 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { MobileLayout } from '@/components/MobileLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
-  Menu as MenuIcon, 
   List, 
   Plus, 
   User, 
@@ -14,13 +12,6 @@ import {
   Users,
   LogOut
 } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import circularLogo from '@/assets/circular-logo.png';
 
 const Menu = () => {
@@ -39,52 +30,14 @@ const Menu = () => {
 
   return (
     <MobileLayout>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-3">
-            <img src={circularLogo} alt="Circular" className="w-10 h-10" />
-            <h1 className="text-xl font-bold text-gradient">Circular</h1>
+        <div className="text-center">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <img src={circularLogo} alt="Circular" className="w-12 h-12" />
+            <h1 className="text-2xl font-bold text-gradient">Circular</h1>
           </div>
-          
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <MenuIcon className="w-5 h-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle className="text-left">Menu</SheetTitle>
-              </SheetHeader>
-              <div className="flex flex-col space-y-4 mt-6">
-                <Link to="/profile" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted">
-                  <User className="w-5 h-5" />
-                  <span>Perfil</span>
-                </Link>
-                <Link to="/help" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted">
-                  <HelpCircle className="w-5 h-5" />
-                  <span>Ajuda</span>
-                </Link>
-                <Link to="/settings" className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted">
-                  <Settings className="w-5 h-5" />
-                  <span>Configurações</span>
-                </Link>
-                <button 
-                  onClick={handleLogout}
-                  className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted text-left w-full"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>Sair</span>
-                </button>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-
-        {/* Welcome */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-2">
+          <h2 className="text-xl font-bold mb-2">
             Olá, {user.name.split(' ')[0]}! 👋
           </h2>
           <p className="text-muted-foreground">
@@ -93,57 +46,103 @@ const Menu = () => {
           </p>
         </div>
 
-        {/* Main Actions */}
-        <div className="flex-1 space-y-4">
-          <Link to="/rides">
-            <Button className="w-full h-16 bg-gradient-primary hover:shadow-glow transition-all duration-300 text-left">
-              <div className="flex items-center space-x-4">
-                <List className="w-6 h-6" />
-                <div>
-                  <div className="font-semibold">Listar Caronas</div>
-                  <div className="text-sm opacity-90">
-                    {user.isDriver ? 'Ver pedidos de carona' : 'Encontrar caronas disponíveis'}
-                  </div>
-                </div>
+        {/* Main Menu Grid */}
+        <div className="grid grid-cols-2 gap-6 flex-1">
+          {/* Listar Caronas */}
+          <Link to="/rides" className="group">
+            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <List className="w-7 h-7 text-primary" />
               </div>
-            </Button>
+              <h3 className="font-semibold text-lg mb-2">Listar Caronas</h3>
+              <p className="text-sm text-muted-foreground">
+                {user.isDriver ? 'Ver pedidos' : 'Encontrar caronas'}
+              </p>
+            </div>
           </Link>
 
-          <Link to={user.isDriver ? "/offer-ride" : "/request-ride"}>
-            <Button className="w-full h-16 bg-gradient-hero hover:shadow-glow transition-all duration-300 text-left">
-              <div className="flex items-center space-x-4">
-                <Plus className="w-6 h-6" />
-                <div>
-                  <div className="font-semibold">
-                    {user.isDriver ? 'Oferecer Carona' : 'Pedir Carona'}
-                  </div>
-                  <div className="text-sm opacity-90">
-                    {user.isDriver ? 'Disponibilizar vagas no seu carro' : 'Solicitar uma carona'}
-                  </div>
-                </div>
+          {/* Oferecer/Pedir Carona */}
+          <Link to={user.isDriver ? "/offer-ride" : "/request-ride"} className="group">
+            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
+              <div className="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-secondary/20 transition-colors">
+                <Plus className="w-7 h-7 text-secondary" />
               </div>
-            </Button>
+              <h3 className="font-semibold text-lg mb-2">
+                {user.isDriver ? 'Oferecer Carona' : 'Pedir Carona'}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {user.isDriver ? 'Disponibilizar vagas' : 'Solicitar carona'}
+              </p>
+            </div>
           </Link>
+
+          {/* Perfil */}
+          <Link to="/profile" className="group">
+            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
+              <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
+                <User className="w-7 h-7 text-accent" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Perfil</h3>
+              <p className="text-sm text-muted-foreground">Meus dados</p>
+            </div>
+          </Link>
+
+          {/* Configurações */}
+          <Link to="/settings" className="group">
+            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
+              <div className="w-14 h-14 bg-muted/20 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-muted/30 transition-colors">
+                <Settings className="w-7 h-7 text-foreground" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Configurações</h3>
+              <p className="text-sm text-muted-foreground">Ajustes do app</p>
+            </div>
+          </Link>
+
+          {/* Ajuda */}
+          <Link to="/help" className="group">
+            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
+              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                <HelpCircle className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Ajuda</h3>
+              <p className="text-sm text-muted-foreground">Suporte</p>
+            </div>
+          </Link>
+
+          {/* Sair */}
+          <button onClick={handleLogout} className="group">
+            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
+              <div className="w-14 h-14 bg-destructive/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-destructive/20 transition-colors">
+                <LogOut className="w-7 h-7 text-destructive" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Sair</h3>
+              <p className="text-sm text-muted-foreground">Fazer logout</p>
+            </div>
+          </button>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-4 mt-8">
-          <div className="bg-gradient-card rounded-xl p-4 shadow-card border">
-            <div className="flex items-center space-x-2">
-              <Car className="w-5 h-5 text-primary" />
-              <span className="text-sm font-medium">Caronas</span>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="bg-gradient-card rounded-2xl p-6 shadow-card border">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <Car className="w-5 h-5 text-primary" />
+              </div>
+              <span className="font-medium">Caronas</span>
             </div>
-            <p className="text-2xl font-bold mt-1">12</p>
-            <p className="text-xs text-muted-foreground">Este mês</p>
+            <p className="text-3xl font-bold mb-1">12</p>
+            <p className="text-sm text-muted-foreground">Este mês</p>
           </div>
 
-          <div className="bg-gradient-card rounded-xl p-4 shadow-card border">
-            <div className="flex items-center space-x-2">
-              <Users className="w-5 h-5 text-secondary" />
-              <span className="text-sm font-medium">Pessoas</span>
+          <div className="bg-gradient-card rounded-2xl p-6 shadow-card border">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="w-10 h-10 bg-secondary/10 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 text-secondary" />
+              </div>
+              <span className="font-medium">Pessoas</span>
             </div>
-            <p className="text-2xl font-bold mt-1">28</p>
-            <p className="text-xs text-muted-foreground">Conectadas</p>
+            <p className="text-3xl font-bold mb-1">28</p>
+            <p className="text-sm text-muted-foreground">Conectadas</p>
           </div>
         </div>
       </div>
