@@ -46,77 +46,101 @@ const Menu = () => {
           </p>
         </div>
 
-        {/* Main Menu Grid */}
-        <div className="grid grid-cols-2 gap-6 flex-1">
+        {/* Main Menu List */}
+        <div className="space-y-4 flex-1">
           {/* Listar Caronas */}
-          <Link to="/rides" className="group">
-            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <List className="w-7 h-7 text-primary" />
+          <Link to="/rides" className="group block">
+            <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <List className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base mb-1">Listar Caronas</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {user.isDriver ? 'Ver pedidos de carona' : 'Encontrar caronas disponíveis'}
+                  </p>
+                </div>
               </div>
-              <h3 className="font-semibold text-lg mb-2">Listar Caronas</h3>
-              <p className="text-sm text-muted-foreground">
-                {user.isDriver ? 'Ver pedidos' : 'Encontrar caronas'}
-              </p>
             </div>
           </Link>
 
           {/* Oferecer/Pedir Carona */}
-          <Link to={user.isDriver ? "/offer-ride" : "/request-ride"} className="group">
-            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
-              <div className="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-secondary/20 transition-colors">
-                <Plus className="w-7 h-7 text-secondary" />
+          <Link to={user.isDriver ? "/offer-ride" : "/request-ride"} className="group block">
+            <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                  <Plus className="w-6 h-6 text-secondary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base mb-1">
+                    {user.isDriver ? 'Oferecer Carona' : 'Pedir Carona'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {user.isDriver ? 'Disponibilizar vagas no seu carro' : 'Solicitar uma carona'}
+                  </p>
+                </div>
               </div>
-              <h3 className="font-semibold text-lg mb-2">
-                {user.isDriver ? 'Oferecer Carona' : 'Pedir Carona'}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {user.isDriver ? 'Disponibilizar vagas' : 'Solicitar carona'}
-              </p>
             </div>
           </Link>
 
           {/* Perfil */}
-          <Link to="/profile" className="group">
-            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
-              <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
-                <User className="w-7 h-7 text-accent" />
+          <Link to="/profile" className="group block">
+            <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                  <User className="w-6 h-6 text-accent" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base mb-1">Perfil</h3>
+                  <p className="text-sm text-muted-foreground">Visualizar e editar meus dados</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-lg mb-2">Perfil</h3>
-              <p className="text-sm text-muted-foreground">Meus dados</p>
             </div>
           </Link>
 
           {/* Configurações */}
-          <Link to="/settings" className="group">
-            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
-              <div className="w-14 h-14 bg-muted/20 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-muted/30 transition-colors">
-                <Settings className="w-7 h-7 text-foreground" />
+          <Link to="/settings" className="group block">
+            <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-muted/20 rounded-xl flex items-center justify-center group-hover:bg-muted/30 transition-colors">
+                  <Settings className="w-6 h-6 text-foreground" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base mb-1">Configurações</h3>
+                  <p className="text-sm text-muted-foreground">Ajustes e preferências do app</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-lg mb-2">Configurações</h3>
-              <p className="text-sm text-muted-foreground">Ajustes do app</p>
             </div>
           </Link>
 
           {/* Ajuda */}
-          <Link to="/help" className="group">
-            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
-              <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <HelpCircle className="w-7 h-7 text-primary" />
+          <Link to="/help" className="group block">
+            <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <HelpCircle className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base mb-1">Ajuda</h3>
+                  <p className="text-sm text-muted-foreground">Central de suporte e FAQ</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-lg mb-2">Ajuda</h3>
-              <p className="text-sm text-muted-foreground">Suporte</p>
             </div>
           </Link>
 
           {/* Sair */}
-          <button onClick={handleLogout} className="group">
-            <div className="bg-gradient-card rounded-2xl p-6 shadow-card border hover:shadow-glow transition-all duration-300 h-full flex flex-col items-center justify-center text-center group-hover:scale-105">
-              <div className="w-14 h-14 bg-destructive/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-destructive/20 transition-colors">
-                <LogOut className="w-7 h-7 text-destructive" />
+          <button onClick={handleLogout} className="group block w-full">
+            <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-destructive/10 rounded-xl flex items-center justify-center group-hover:bg-destructive/20 transition-colors">
+                  <LogOut className="w-6 h-6 text-destructive" />
+                </div>
+                <div className="flex-1 text-left">
+                  <h3 className="font-semibold text-base mb-1">Sair</h3>
+                  <p className="text-sm text-muted-foreground">Fazer logout da conta</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-lg mb-2">Sair</h3>
-              <p className="text-sm text-muted-foreground">Fazer logout</p>
             </div>
           </button>
         </div>
