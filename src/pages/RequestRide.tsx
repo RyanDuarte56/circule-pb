@@ -26,7 +26,12 @@ const RequestRide = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Em produção, enviaria para API
-    navigate('/rides');
+    navigate('/ride-confirmation', { 
+      state: { 
+        type: 'request',
+        ...formData
+      } 
+    });
   };
 
   return (

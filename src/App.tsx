@@ -16,6 +16,7 @@ import Menu from "./pages/Menu";
 import Profile from "./pages/Profile";
 import RequestRide from "./pages/RequestRide";
 import OfferRide from "./pages/OfferRide";
+import RideConfirmation from "./pages/RideConfirmation";
 import RidesList from "./pages/RidesList";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/request-ride" element={<RequestRide />} />
             <Route path="/offer-ride" element={<OfferRide />} />
+            <Route path="/ride-confirmation" element={<RideConfirmation />} />
             <Route path="/rides" element={<RidesList />} />
             <Route path="/chat/:rideId" element={<Chat />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileLayout } from '@/components/MobileLayout';
-import { ArrowLeft, Clock, MapPin, Navigation, MessageSquare, DollarSign, Users } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Navigation, MessageSquare, DollarSign, Users, Route } from 'lucide-react';
 
 const OfferRide = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +16,8 @@ const OfferRide = () => {
     departure: '',
     destination: '',
     description: '',
-    shareFuel: false
+    shareFuel: false,
+    allowDetour: false
   });
   
   const navigate = useNavigate();
@@ -28,7 +29,12 @@ const OfferRide = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Em produção, enviaria para API
-    navigate('/rides');
+    navigate('/ride-confirmation', { 
+      state: { 
+        type: 'offer',
+        ...formData
+      } 
+    });
   };
 
   return (
@@ -123,20 +129,39 @@ const OfferRide = () => {
             </div>
           </div>
 
-          <div className="flex items-start space-x-3 bg-gradient-card rounded-lg p-4 border">
-            <Checkbox
-              id="shareFuel"
-              checked={formData.shareFuel}
-              onCheckedChange={(checked) => handleInputChange('shareFuel', checked as boolean)}
-            />
-            <div className="flex-1">
-              <Label htmlFor="shareFuel" className="flex items-center space-x-2 cursor-pointer">
-                <DollarSign className="w-4 h-4 text-accent" />
-                <span>Dividir combustível</span>
-              </Label>
-              <p className="text-xs text-muted-foreground mt-1">
-                Permitir que passageiros contribuam com os custos
-              </p>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3 bg-gradient-card rounded-lg p-4 border">
+              <Checkbox
+                id="shareFuel"
+                checked={formData.shareFuel}
+                onCheckedChange={(checked) => handleInputChange('shareFuel', checked as boolean)}
+              />
+              <div className="flex-1">
+                <Label htmlFor="shareFuel" className="flex items-center space-x-2 cursor-pointer">
+                  <DollarSign className="w-4 h-4 text-accent" />
+                  <span>Dividir combustível</span>
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Permitir que passageiros contribuam com os custos
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-3 bg-gradient-card rounded-lg p-4 border">
+              <Checkbox
+                id="allowDetour"
+                checked={formData.allowDetour}
+                onCheckedChange={(checked) => handleInputChange('allowDetour', checked as boolean)}
+              />
+              <div className="flex-1">
+                <Label htmlFor="allowDetour" className="flex items-center space-x-2 cursor-pointer">
+                  <Route className="w-4 h-4 text-accent" />
+                  <span>Aceitar pequenos desvios</span>
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Permitir alterações menores na rota para pegar passageiros
+                </p>
+              </div>
             </div>
           </div>
 
