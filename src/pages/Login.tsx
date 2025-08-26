@@ -17,8 +17,11 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, password);
-    navigate('/menu');
+    navigate('/user-type-selection?from=login');
+  };
+
+  const handleGoogleLogin = () => {
+    navigate('/user-type-selection?from=login');
   };
 
   return (
@@ -96,6 +99,7 @@ const Login = () => {
               type="button" 
               variant="outline" 
               className="w-full"
+              onClick={handleGoogleLogin}
             >
               <Chrome className="w-4 h-4 mr-2" />
               Entrar com Google
@@ -103,7 +107,7 @@ const Login = () => {
 
             <div className="text-center">
               <Link 
-                to="/register" 
+                to="/user-type-selection?from=register" 
                 className="text-primary hover:text-primary-glow transition-colors"
               >
                 Não tem conta? Cadastre-se
