@@ -23,7 +23,7 @@ const UserTypeSelection = () => {
       navigate(`/register?userType=${selectedType}`);
     } else if (from === 'login') {
       // Simular o login e navegar para o menu
-      login('user@example.com', 'password'); // Login mock
+      login('user@example.com', 'password', selectedType === 'driver');
       navigate('/menu');
     }
   };

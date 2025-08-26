@@ -15,7 +15,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string, isDriver?: boolean) => void;
   logout: () => void;
   register: (userData: Omit<User, 'id'>) => void;
   toggleDriverMode: () => void;
@@ -26,7 +26,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = (email: string, password: string) => {
+  const login = (email: string, password: string, isDriver = false) => {
     // Mock login - em produção seria uma API call
     const mockUser: User = {
       id: '1',
@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       phone: '(83) 99999-9999',
       age: 22,
       occupation: 'aluno',
-      isDriver: false,
+      isDriver,
       photo: '',
       city: 'João Pessoa',
       nationality: 'Brasileiro'

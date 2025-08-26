@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserTypeSelection from "./pages/UserTypeSelection";
+import EmailVerification from "./pages/EmailVerification";
 import DriverSetup from "./pages/DriverSetup";
 import DriverCRLV from "./pages/DriverCRLV";
 import DriverCNH from "./pages/DriverCNH";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/user-type-selection" element={<UserTypeSelection />} />
+            <Route path="/email-verification" element={<EmailVerification />} />
             <Route path="/driver-setup" element={<DriverSetup />} />
             <Route path="/driver-crlv" element={<DriverCRLV />} />
             <Route path="/driver-cnh" element={<DriverCNH />} />

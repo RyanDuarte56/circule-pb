@@ -35,16 +35,21 @@ const Register = () => {
       return;
     }
     
+    // Pegar o tipo de usuário da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const userType = urlParams.get('userType') || 'passenger';
+    
     register({
       name: `${formData.name} ${formData.surname}`,
       email: formData.email,
       phone: formData.phone,
       age: parseInt(formData.age),
       occupation: formData.occupation as 'aluno' | 'professor' | 'funcionario',
-      isDriver: false
+      isDriver: userType === 'driver'
     });
     
-    navigate('/driver-setup');
+    // Ir para verificação de email com os dados
+    navigate(`/email-verification?email=${formData.email}&userType=${userType}`);
   };
 
   return (
