@@ -38,7 +38,16 @@ const TrackRide = () => {
     return null;
   }
   
-  const ride = rideData;
+  // Garantir que os dados do usuário existam
+  const ride = {
+    ...rideData,
+    user: rideData.user || {
+      name: 'Motorista',
+      photo: '',
+      rating: 4.5,
+      occupation: 'aluno' as const
+    }
+  };
 
   // Atualizar tempo estimado
   useEffect(() => {

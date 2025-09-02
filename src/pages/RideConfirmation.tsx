@@ -130,7 +130,20 @@ const RideConfirmation = () => {
               <>
                 <Button 
                   className="w-full bg-gradient-primary hover:shadow-glow"
-                  onClick={() => navigate(`/track-ride/${rideData.rideId || 'demo'}`, { state: rideData })}
+                  onClick={() => navigate(`/track-ride/${rideData.rideId || 'demo'}`, { 
+                    state: {
+                      ...rideData,
+                      id: rideData.rideId || 'demo',
+                      user: {
+                        name: 'João Silva',
+                        photo: '',
+                        rating: 4.8,
+                        occupation: 'aluno'
+                      },
+                      vehicle: 'Honda Civic 2020 - Prata',
+                      status: 'active'
+                    }
+                  })}
                 >
                   <Route className="w-4 h-4 mr-2" />
                   Acompanhar Corrida
