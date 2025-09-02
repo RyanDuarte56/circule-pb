@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MobileLayout } from '@/components/MobileLayout';
-import { CheckCircle, Car, UserCheck, Clock, MapPin, Navigation } from 'lucide-react';
+import { CheckCircle, Car, UserCheck, Clock, MapPin, Navigation, Route, Star } from 'lucide-react';
 
 interface RideData {
-  type: 'offer' | 'request';
+  type: 'offer' | 'request' | 'confirmed';
   time: string;
   departure: string;
   destination: string;
   seats?: string;
   shareFuel: boolean;
   allowDetour?: boolean;
+  rideId?: string;
 }
 
 const RideConfirmation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const rideData = location.state as RideData;
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -38,6 +40,7 @@ const RideConfirmation = () => {
   }
 
   const isOffer = rideData.type === 'offer';
+  const isConfirmed = rideData.type === 'confirmed';
 
   return (
     <MobileLayout>
@@ -56,11 +59,13 @@ const RideConfirmation = () => {
           {/* Title */}
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-foreground">
-              {isOffer ? 'Carona Oferecida!' : 'Carona Solicitada!'}
+              {isOffer ? 'Carona Oferecida!' : isConfirmed ? 'Carona Confirmada!' : 'Carona Solicitada!'}
             </h1>
             <p className="text-muted-foreground">
               {isOffer 
                 ? 'Sua carona foi adicionada com sucesso. Os passageiros poderão vê-la na lista.'
+                : isConfirmed
+                ? 'Sua carona foi confirmada! Agora você pode acompanhar o trajeto em tempo real.'
                 : 'Sua solicitação foi enviada. Os motoristas poderão vê-la e entrar em contato.'
               }
             </p>
@@ -121,17 +126,53 @@ const RideConfirmation = () => {
 
           {/* Actions */}
           <div className="w-full space-y-3 pt-4">
-            <Link to="/rides" className="block">
-              <Button className="w-full bg-gradient-primary hover:shadow-glow">
-                Ver {isOffer ? 'Minhas Caronas' : 'Caronas Disponíveis'}
-              </Button>
-            </Link>
-            
-            <Link to="/menu" className="block">
-              <Button variant="outline" className="w-full">
-                Voltar ao Menu
-              </Button>
-            </Link>
+            {isConfirmed ? (
+              <>
+                <Button 
+                  className="w-full bg-gradient-primary hover:shadow-glow"
+                  onClick={() => navigate(`/track-ride/${rideData.rideId || 'demo'}`, { state: rideData })}
+                >
+                  <Route className="w-4 h-4 mr-2" />
+                  Acompanhar Corrida
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate('/rate-user/demo-user', { 
+                    state: { 
+                      user: { 
+                        name: 'João Silva', 
+                        photo: '', 
+                        occupation: 'aluno' 
+                      }, 
+                      rideId: rideData.rideId || 'demo' 
+                    } 
+                  })}
+                >
+                  <Star className="w-4 h-4 mr-2" />
+                  Avaliar Usuário
+                </Button>
+                <Link to="/rides" className="block">
+                  <Button variant="outline" className="w-full">
+                    Ver Outras Caronas
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/rides" className="block">
+                  <Button className="w-full bg-gradient-primary hover:shadow-glow">
+                    Ver {isOffer ? 'Minhas Caronas' : 'Caronas Disponíveis'}
+                  </Button>
+                </Link>
+                
+                <Link to="/menu" className="block">
+                  <Button variant="outline" className="w-full">
+                    Voltar ao Menu
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Next Steps */}

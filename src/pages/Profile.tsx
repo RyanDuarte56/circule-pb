@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -15,13 +15,27 @@ import {
   MapPin, 
   Flag,
   Car,
-  Users
+  Users,
+  Star
 } from 'lucide-react';
 
 const Profile = () => {
   const { user, toggleDriverMode } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = React.useState('');
 
   if (!user) return null;
+
+  const handleToggleDriverMode = () => {
+    try {
+      setError('');
+      toggleDriverMode();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Erro ao alternar perfil.');
+    }
+  };
+
+  const canToggleProfile = user.hasDriverProfile && user.hasPassengerProfile;
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -83,6 +97,13 @@ const Profile = () => {
             {getOccupationLabel(user.occupation)} • CI/UFPB
           </p>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 w-full max-w-sm">
+              <p className="text-red-700 text-sm text-center">{error}</p>
+            </div>
+          )}
+
           {/* Driver Toggle */}
           <div className="flex items-center space-x-3 bg-gradient-card rounded-full px-4 py-2 shadow-card border">
             <div className="flex items-center space-x-2">
@@ -91,11 +112,34 @@ const Profile = () => {
                 {user.isDriver ? 'Motorista' : 'Passageiro'}
               </span>
             </div>
-            <Switch
-              checked={user.isDriver}
-              onCheckedChange={toggleDriverMode}
-            />
+            {canToggleProfile && (
+              <Switch
+                checked={user.isDriver}
+                onCheckedChange={handleToggleDriverMode}
+              />
+            )}
           </div>
+          
+          {!canToggleProfile && (
+            <div className="text-center mt-2">
+              <p className="text-xs text-muted-foreground mb-3 max-w-sm">
+                {user.hasDriverProfile || user.hasPassengerProfile 
+                  ? 'Você só tem um tipo de perfil criado'
+                  : 'Crie perfis adicionais para alternar entre eles'
+                }
+              </p>
+              
+              {user.hasPassengerProfile && !user.hasDriverProfile && (
+                <Button 
+                  onClick={() => navigate('/driver-setup')}
+                  className="bg-gradient-primary hover:shadow-glow transition-all duration-300 text-sm px-4 py-2"
+                >
+                  <Car className="w-4 h-4 mr-2" />
+                  Criar Conta de Motorista
+                </Button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Profile Details */}
@@ -160,11 +204,13 @@ const Profile = () => {
               <p className="text-xs text-muted-foreground">Caronas realizadas</p>
             </div>
 
-            <div className="bg-gradient-card rounded-xl p-4 shadow-card border text-center">
-              <Users className="w-6 h-6 text-secondary mx-auto mb-2" />
-              <p className="text-2xl font-bold">4.8</p>
-              <p className="text-xs text-muted-foreground">Avaliação média</p>
-            </div>
+            <Link to="/user-ratings" className="block">
+              <div className="bg-gradient-card rounded-xl p-4 shadow-card border text-center hover:shadow-glow transition-all duration-300">
+                <Star className="w-6 h-6 text-yellow-500 mx-auto mb-2" />
+                <p className="text-2xl font-bold">4.8</p>
+                <p className="text-xs text-muted-foreground">Minhas avaliações</p>
+              </div>
+            </Link>
           </div>
         </div>
 

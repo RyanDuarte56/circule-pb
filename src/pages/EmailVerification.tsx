@@ -18,8 +18,7 @@ const EmailVerification = () => {
   const userType = searchParams.get('userType');
   const { login } = useAuth();
 
-  // Mock code: 123456
-  const MOCK_CODE = '123456';
+
 
   useEffect(() => {
     if (countdown > 0) {
@@ -31,12 +30,12 @@ const EmailVerification = () => {
   const handleVerifyCode = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (code === MOCK_CODE) {
-      // Simular login com o tipo correto de usuário
+    if (code.length === 6) {
+      // Simular verificação de código
       login(email || 'user@example.com', 'password', userType === 'driver');
       navigate('/menu');
     } else {
-      alert('Código incorreto. Tente: 123456');
+      alert('Por favor, insira um código de 6 dígitos.');
     }
   };
 
@@ -47,7 +46,7 @@ const EmailVerification = () => {
     // Simular envio de email
     setTimeout(() => {
       setIsResending(false);
-      alert('Novo código enviado! Use: 123456');
+      alert('Novo código enviado para seu email!');
     }, 2000);
   };
 

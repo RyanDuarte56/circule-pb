@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,8 +22,20 @@ const RequestRide = () => {
   });
   
   const navigate = useNavigate();
+  const location = useLocation();
   const { addRequest } = useRides();
   const { user } = useAuth();
+
+  // Preencher campos se vier de rota favorita
+  useEffect(() => {
+    if (location.state?.departure && location.state?.destination) {
+      setFormData(prev => ({
+        ...prev,
+        departure: location.state.departure,
+        destination: location.state.destination
+      }));
+    }
+  }, [location.state]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MobileLayout } from '@/components/MobileLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,7 +10,8 @@ import {
   Settings,
   Car,
   Users,
-  LogOut
+  LogOut,
+  Star
 } from 'lucide-react';
 import circularLogo from '@/assets/circular-logo.png';
 
@@ -23,8 +24,13 @@ const Menu = () => {
     navigate('/');
   };
 
+  useEffect(() => {
+    if (!user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
+
   if (!user) {
-    navigate('/');
     return null;
   }
 
@@ -94,6 +100,21 @@ const Menu = () => {
                 <div className="flex-1">
                   <h3 className="font-semibold text-base mb-1">Perfil</h3>
                   <p className="text-sm text-muted-foreground">Visualizar e editar meus dados</p>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          {/* Rotas Favoritas */}
+          <Link to="/favorite-routes" className="group block">
+            <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center group-hover:bg-yellow-500/20 transition-colors">
+                  <Star className="w-6 h-6 text-yellow-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base mb-1">Rotas Favoritas</h3>
+                  <p className="text-sm text-muted-foreground">Gerenciar suas rotas mais utilizadas</p>
                 </div>
               </div>
             </div>

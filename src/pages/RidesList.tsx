@@ -17,9 +17,7 @@ import {
   MessageCircle,
   Star,
   Car,
-  Filter,
-  Route,
-  MapIcon
+  Filter
 } from 'lucide-react';
 
 const RidesList = () => {
@@ -27,7 +25,8 @@ const RidesList = () => {
   const { rides, requests } = useRides();
   const navigate = useNavigate();
   const [filterType, setFilterType] = useState<string>('all');
-  const [showMap, setShowMap] = useState(false);
+
+  const [sortBy, setSortBy] = useState<string>('time');
 
   if (!user) return null;
 
@@ -41,20 +40,37 @@ const RidesList = () => {
 
   // Motorista vê suas próprias caronas oferecidas + pedidos de passageiros
   // Passageiro vê caronas oferecidas por motoristas
-  const ridesData = user.isDriver ? [...rides.filter(ride => ride.user.name === user.name), ...requests] : rides;
+  const ridesData = user.isDriver ? [...rides, ...requests] : rides.filter(ride => ride.user.name !== user.name);
   const isDriverView = user.isDriver;
+
+
 
   const filteredRides = ridesData.filter(ride => {
     if (filterType === 'all') return true;
-    if (filterType === 'favorite' && isDriverView) {
-      // Simular trajeto favorito: CI → Manaíra
-      return ride.departure.includes('CI') && ride.destination.includes('Manaíra');
-    }
-    if (filterType === 'proximity' && isDriverView) {
-      // Ordenar por proximidade (simulado)
-      return true;
+    if (filterType === 'price') {
+      // Filtrar caronas com preço (que dividem combustível)
+      return ride.shareFuel;
     }
     return true;
+  });
+
+  // Aplicar ordenação
+  const sortedRides = [...filteredRides].sort((a, b) => {
+    if (sortBy === 'time') {
+      // Ordenar por horário mais próximo
+      return a.time.localeCompare(b.time);
+    }
+    if (sortBy === 'price' && !isDriverView) {
+      // Ordenar por menor preço (apenas para passageiros)
+      const priceA = (a as any).price || 0;
+      const priceB = (b as any).price || 0;
+      return priceA - priceB;
+    }
+    if (sortBy === 'rating') {
+      // Ordenar por melhor avaliação
+      return b.user.rating - a.user.rating;
+    }
+    return 0;
   });
 
   return (
@@ -76,58 +92,61 @@ const RidesList = () => {
             <p className="text-sm text-muted-foreground">
               {filteredRides.length} {isDriverView ? 'pedidos encontrados' : 'caronas disponíveis'}
             </p>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowMap(!showMap)}
-            >
-              <MapIcon className="w-4 h-4 mr-2" />
-              {showMap ? 'Lista' : 'Mapa'}
-            </Button>
+
           </div>
 
-          {/* Filters for Driver */}
-          {isDriverView && (
-            <div className="flex items-center space-x-3">
-              <Filter className="w-4 h-4 text-muted-foreground" />
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filtrar pedidos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos os pedidos</SelectItem>
-                  <SelectItem value="favorite">Trajeto favorito</SelectItem>
-                  <SelectItem value="proximity">Por proximidade</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          {/* Filters */}
+          <div className="flex items-center space-x-3 overflow-x-auto pb-2">
+            <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder={isDriverView ? "Filtrar pedidos" : "Filtrar caronas"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{isDriverView ? 'Todos os pedidos' : 'Todas as caronas'}</SelectItem>
+                {!isDriverView && <SelectItem value="price">Com preço</SelectItem>}
+              </SelectContent>
+            </Select>
+            
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-44">
+                <SelectValue placeholder="Ordenar por" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="time">Horário</SelectItem>
+                {!isDriverView && <SelectItem value="price">Menor preço</SelectItem>}
+                <SelectItem value="rating">Avaliação</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-          {/* Map View (placeholder) */}
-          {showMap && (
-            <div className="bg-gradient-card rounded-xl p-6 shadow-card border">
-              <div className="flex items-center justify-center space-x-2 text-muted-foreground mb-4">
-                <Route className="w-5 h-5" />
-                <span className="font-medium">Mapa da Rota</span>
-              </div>
-              <div className="bg-muted rounded-lg h-48 flex items-center justify-center">
-                <div className="text-center">
-                  <MapIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm text-muted-foreground">
-                    Visualização do mapa em desenvolvimento
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Rota: CI → Manaíra Shopping via BR-230
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+
         </div>
 
         {/* Rides List */}
         <div className="space-y-4 flex-1">
-          {filteredRides.map((ride) => (
+          {sortedRides.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="bg-muted rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Car className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <h3 className="font-medium mb-2">Nenhuma carona encontrada</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Tente ajustar os filtros ou criar uma nova {isDriverView ? 'oferta' : 'solicitação'}
+              </p>
+              <Button 
+                onClick={() => {
+                  setFilterType('all');
+                  setSortBy('time');
+                }}
+                variant="outline"
+                size="sm"
+              >
+                Limpar filtros
+              </Button>
+            </div>
+          ) : (
+            sortedRides.map((ride) => (
             <div key={ride.id} className="bg-gradient-card rounded-xl p-4 shadow-card border">
               {/* User Info */}
               <div className="flex items-center justify-between mb-3">
@@ -225,10 +244,19 @@ const RidesList = () => {
                   {isDriverView ? 'Responder Pedido' : 'Conversar'}
                 </Button>
                 
-                {/* Botão Confirmar/Acompanhar para Passageiros */}
+                {/* Botão Confirmar Carona para Passageiros */}
                 {!isDriverView && (
                   <Button 
-                    onClick={() => navigate(`/track-ride/${ride.id}`)}
+                    onClick={() => navigate('/ride-confirmation', { 
+                      state: { 
+                        type: 'confirmed',
+                        time: ride.time,
+                        departure: ride.departure,
+                        destination: ride.destination,
+                        shareFuel: ride.shareFuel,
+                        rideId: ride.id
+                      } 
+                    })}
                     variant="outline"
                     className="w-full"
                   >
@@ -237,7 +265,8 @@ const RidesList = () => {
                 )}
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         {/* Add Ride Button */}

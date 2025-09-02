@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -23,23 +23,35 @@ import {
 const TrackRide = () => {
   const { rideId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { rides } = useRides();
-  const [isTracking, setIsTracking] = useState(false);
+  const [isTracking, setIsTracking] = useState(true);
 
-  const ride = rides.find(r => r.id === rideId);
+  const [estimatedTime, setEstimatedTime] = useState(12);
 
-  if (!ride) {
-    return (
-      <MobileLayout>
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <h2 className="text-xl font-semibold mb-4">Carona não encontrada</h2>
-          <Link to="/rides-list">
-            <Button>Voltar às Caronas</Button>
-          </Link>
-        </div>
-      </MobileLayout>
-    );
+  // Dados da carona podem vir via state ou buscar na lista
+  const rideData = location.state || rides.find(r => r.id === rideId);
+  
+  // Se não encontrar a carona, redirecionar
+  if (!rideData) {
+    navigate('/rides-list');
+    return null;
   }
+  
+  const ride = rideData;
+
+  // Atualizar tempo estimado
+  useEffect(() => {
+    if (!isTracking) return;
+    
+    const interval = setInterval(() => {
+      setEstimatedTime(prev => Math.max(1, prev - 0.5));
+    }, 30000); // Atualiza a cada 30 segundos
+    
+    return () => clearInterval(interval);
+  }, [isTracking]);
+
+
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -150,74 +162,60 @@ const TrackRide = () => {
           </div>
         </div>
 
-        {/* Map Section */}
-        {isTracking && (
-          <div className="bg-gradient-card rounded-xl p-4 shadow-card border mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Localização em Tempo Real</h3>
-              <div className="flex items-center space-x-2 text-sm text-accent">
-                <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
-                <span>Ao vivo</span>
+        {/* Status da Viagem */}
+        <div className="bg-gradient-card rounded-xl p-4 shadow-card border mb-6">
+          <h3 className="font-semibold mb-4">Status da Viagem</h3>
+          
+          <div className="space-y-3">
+            <div className="bg-muted/50 rounded-lg p-3">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-2">
+                  <Route className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium">Tempo estimado:</span>
+                </div>
+                <span className="text-accent font-medium">{Math.round(estimatedTime)} min</span>
               </div>
             </div>
             
-            <div className="bg-muted rounded-lg h-64 flex items-center justify-center mb-4">
-              <div className="text-center">
-                <MapIcon className="w-16 h-16 mx-auto mb-3 opacity-50" />
-                <p className="font-medium mb-2">Mapa Interativo</p>
-                <p className="text-sm text-muted-foreground">
-                  Acompanhe a localização do motorista em tempo real
-                </p>
-                <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                    <span>Motorista</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-3 h-3 bg-accent rounded-full"></div>
-                    <span>Você</span>
-                  </div>
-                </div>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+              <div className="flex items-center space-x-2 text-sm text-green-700">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="font-medium">Motorista confirmou a carona</span>
               </div>
             </div>
-
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="flex items-center space-x-2 text-sm">
-                <Route className="w-4 h-4 text-muted-foreground" />
-                <span className="font-medium">Tempo estimado:</span>
-                <span className="text-accent font-medium">12 min</span>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center space-x-2 text-sm text-blue-700">
+                <MapPin className="w-4 h-4" />
+                <span>Ponto de encontro: {ride.departure}</span>
               </div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* Action Buttons */}
         <div className="mt-auto space-y-3">
-          {!isTracking ? (
+          <div className="space-y-2">
             <Button 
-              onClick={handleStartTracking}
-              className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
+              variant="outline"
+              className="w-full"
+              onClick={() => navigate('/chat/' + ride.id)}
             >
-              <MapIcon className="w-4 h-4 mr-2" />
-              Acompanhar Corrida
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Conversar com Motorista
             </Button>
-          ) : (
-            <div className="space-y-2">
-              <Button 
-                variant="outline"
-                className="w-full"
-                onClick={() => setIsTracking(false)}
-              >
-                Parar Acompanhamento
-              </Button>
-              <Button 
-                variant="destructive"
-                className="w-full"
-              >
-                Cancelar Carona
-              </Button>
-            </div>
-          )}
+            <Button 
+              variant="destructive"
+              className="w-full"
+              onClick={() => {
+                if (confirm('Tem certeza que deseja cancelar esta carona?')) {
+                  navigate('/rides');
+                }
+              }}
+            >
+              Cancelar Carona
+            </Button>
+          </div>
           
           <div className="bg-muted/50 rounded-lg p-3 text-center">
             <p className="text-sm text-muted-foreground">

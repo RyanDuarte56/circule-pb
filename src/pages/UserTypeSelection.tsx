@@ -2,9 +2,10 @@ import React from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MobileLayout } from '@/components/MobileLayout';
-import { Car, Users, ArrowRight } from 'lucide-react';
+import { Car, Users, ArrowRight, Settings } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import circularLogo from '@/assets/circular-logo.png';
 
@@ -13,18 +14,42 @@ const UserTypeSelection = () => {
   const [searchParams] = useSearchParams();
   const from = searchParams.get('from') || 'login';
   const userType = searchParams.get('userType');
+  const email = searchParams.get('email');
+  const password = searchParams.get('password');
   const { login } = useAuth();
   const [selectedType, setSelectedType] = React.useState<'passenger' | 'driver'>(
     (userType as 'passenger' | 'driver') || 'passenger'
   );
+  const [setAsDefault, setSetAsDefault] = React.useState(false);
 
   const handleContinue = () => {
-    if (from === 'register') {
-      navigate(`/register?userType=${selectedType}`);
-    } else if (from === 'login') {
-      // Simular o login e navegar para o menu
-      login('user@example.com', 'password', selectedType === 'driver');
-      navigate('/menu');
+    // Salvar preferências no localStorage
+    if (setAsDefault) {
+      localStorage.setItem('skipUserTypeSelection', 'true');
+      localStorage.setItem('defaultUserType', selectedType);
+    }
+    
+    if (from === 'register' && email && password) {
+      // Fazer login com os dados do usuário recém-cadastrado
+      try {
+        login(email, password, selectedType === 'driver');
+        navigate('/menu');
+      } catch (error) {
+        console.error('Erro ao fazer login após cadastro:', error);
+        navigate('/login');
+      }
+    } else if (from === 'login' && email && password) {
+      // Fazer login com os dados reais do usuário
+      try {
+        login(email, password, selectedType === 'driver');
+        navigate('/menu');
+      } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        navigate('/login');
+      }
+    } else {
+      // Fallback para login se não tiver dados
+      navigate('/login');
     }
   };
 
@@ -139,6 +164,30 @@ const UserTypeSelection = () => {
                 </>
               )}
             </ul>
+          </div>
+
+          {/* Preferences Section */}
+          <div className="mt-6 p-4 rounded-xl bg-blue-50 border border-blue-200 space-y-4">
+            <div className="flex items-center space-x-2">
+              <Settings className="w-4 h-4 text-blue-600" />
+              <h4 className="font-medium text-blue-800">Preferências</h4>
+            </div>
+            
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="setDefault"
+                checked={setAsDefault}
+                onCheckedChange={(checked) => setSetAsDefault(checked as boolean)}
+              />
+              <div className="space-y-1">
+                <Label htmlFor="setDefault" className="text-sm font-medium text-blue-800">
+                  Definir como padrão
+                </Label>
+                <p className="text-xs text-blue-600">
+                  Esta tela não aparecerá mais ao fazer login. Você pode alterar isso nas configurações.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

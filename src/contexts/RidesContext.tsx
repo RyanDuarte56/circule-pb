@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface Ride {
   id: string;
@@ -34,99 +34,40 @@ interface RidesContextType {
 const RidesContext = createContext<RidesContextType | undefined>(undefined);
 
 export const RidesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [rides, setRides] = useState<Ride[]>([
-    {
-      id: '1',
-      user: {
-        name: 'João Santos',
-        photo: '',
-        rating: 4.8,
-        occupation: 'aluno'
-      },
-      time: '18:00',
-      departure: 'CI - Centro de Informática',
-      destination: 'Manaíra Shopping',
-      price: 5,
-      availableSeats: 3,
-      shareFuel: true,
-      vehicle: 'Honda Civic Prata',
-      status: 'active',
-      createdAt: new Date('2024-01-15')
-    },
-    {
-      id: '2',
-      user: {
-        name: 'Maria Silva',
-        photo: '',
-        rating: 4.9,
-        occupation: 'professor'
-      },
-      time: '19:30',
-      departure: 'CI - Centro de Informática',
-      destination: 'Cabo Branco',
-      price: 8,
-      availableSeats: 2,
-      shareFuel: true,
-      vehicle: 'Toyota Corolla Branco',
-      status: 'active',
-      createdAt: new Date('2024-01-14')
-    }
-  ]);
+  const [rides, setRides] = useState<Ride[]>([]);
+  const [requests, setRequests] = useState<Ride[]>([]);
+  const [rideHistory, setRideHistory] = useState<Ride[]>([]);
 
-  const [requests, setRequests] = useState<Ride[]>([
-    {
-      id: '1',
-      user: {
-        name: 'Ana Costa',
-        photo: '',
-        rating: 4.7,
-        occupation: 'aluno'
-      },
-      time: '17:00',
-      departure: 'CI - Centro de Informática',
-      destination: 'Bessa',
-      requestedSeats: 1,
-      shareFuel: true,
-      status: 'active',
-      createdAt: new Date('2024-01-16')
-    },
-    {
-      id: '2',
-      user: {
-        name: 'Pedro Lima',
-        photo: '',
-        rating: 4.6,
-        occupation: 'funcionario'
-      },
-      time: '19:00',
-      departure: 'CI - Centro de Informática',
-      destination: 'Tambaú',
-      requestedSeats: 2,
-      shareFuel: false,
-      status: 'active',
-      createdAt: new Date('2024-01-15')
+  // Carregar dados do localStorage na inicialização
+  useEffect(() => {
+    const savedRides = localStorage.getItem('allRides');
+    const savedRequests = localStorage.getItem('allRequests');
+    const savedHistory = localStorage.getItem('allRideHistory');
+    
+    if (savedRides) {
+      const parsedRides = JSON.parse(savedRides).map((ride: any) => ({
+        ...ride,
+        createdAt: new Date(ride.createdAt)
+      }));
+      setRides(parsedRides);
     }
-  ]);
-
-  const [rideHistory, setRideHistory] = useState<Ride[]>([
-    {
-      id: 'h1',
-      user: {
-        name: 'Carlos Mendes',
-        photo: '',
-        rating: 4.9,
-        occupation: 'professor'
-      },
-      time: '08:00',
-      departure: 'CI - Centro de Informática',
-      destination: 'Shopping Tambaú',
-      price: 6,
-      availableSeats: 3,
-      shareFuel: true,
-      status: 'completed',
-      createdAt: new Date('2024-01-10')
+    
+    if (savedRequests) {
+      const parsedRequests = JSON.parse(savedRequests).map((request: any) => ({
+        ...request,
+        createdAt: new Date(request.createdAt)
+      }));
+      setRequests(parsedRequests);
     }
-  ]);
+    
+    if (savedHistory) {
+      const parsedHistory = JSON.parse(savedHistory).map((history: any) => ({
+        ...history,
+        createdAt: new Date(history.createdAt)
+      }));
+      setRideHistory(parsedHistory);
+    }
+  }, []);
 
   const addRide = (rideData: Omit<Ride, 'id' | 'createdAt' | 'status'>) => {
     const newRide: Ride = {
@@ -135,7 +76,9 @@ export const RidesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       status: 'active',
       createdAt: new Date()
     };
-    setRides(prev => [newRide, ...prev]);
+    const updatedRides = [newRide, ...rides];
+    setRides(updatedRides);
+    localStorage.setItem('allRides', JSON.stringify(updatedRides));
   };
 
   const addRequest = (requestData: Omit<Ride, 'id' | 'createdAt' | 'status'>) => {
@@ -145,21 +88,30 @@ export const RidesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       status: 'active',
       createdAt: new Date()
     };
-    setRequests(prev => [newRequest, ...prev]);
+    const updatedRequests = [newRequest, ...requests];
+    setRequests(updatedRequests);
+    localStorage.setItem('allRequests', JSON.stringify(updatedRequests));
   };
 
   const updateRideStatus = (id: string, status: Ride['status']) => {
-    setRides(prev => prev.map(ride => 
+    const updatedRides = rides.map(ride => 
       ride.id === id ? { ...ride, status } : ride
-    ));
-    setRequests(prev => prev.map(request => 
+    );
+    const updatedRequests = requests.map(request => 
       request.id === id ? { ...request, status } : request
-    ));
+    );
+    
+    setRides(updatedRides);
+    setRequests(updatedRequests);
+    localStorage.setItem('allRides', JSON.stringify(updatedRides));
+    localStorage.setItem('allRequests', JSON.stringify(updatedRequests));
     
     if (status === 'completed') {
       const completedRide = [...rides, ...requests].find(item => item.id === id);
       if (completedRide) {
-        setRideHistory(prev => [{ ...completedRide, status }, ...prev]);
+        const updatedHistory = [{ ...completedRide, status }, ...rideHistory];
+        setRideHistory(updatedHistory);
+        localStorage.setItem('allRideHistory', JSON.stringify(updatedHistory));
       }
     }
   };

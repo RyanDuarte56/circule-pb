@@ -39,12 +39,18 @@ const RideHistory = () => {
     }).format(date);
   };
 
-  // Mock data para estatísticas
+  // Calcular estatísticas reais baseadas no histórico
   const stats = {
-    totalRides: 24,
-    totalPassengers: 67,
-    totalEarnings: 340,
-    averageRating: 4.8
+    totalRides: rideHistory.length,
+    totalPassengers: rideHistory.reduce((total, ride) => {
+      return total + (ride.availableSeats ? (4 - ride.availableSeats) : 1);
+    }, 0),
+    totalEarnings: rideHistory.reduce((total, ride) => {
+      return total + (ride.price || 0);
+    }, 0),
+    averageRating: rideHistory.length > 0 
+      ? (rideHistory.reduce((total, ride) => total + ride.user.rating, 0) / rideHistory.length).toFixed(1)
+      : 0
   };
 
   return (
@@ -206,13 +212,13 @@ const RideHistory = () => {
           <div className="mt-6 bg-gradient-card rounded-xl p-4 shadow-card border">
             <div className="flex items-center space-x-2 mb-3">
               <TrendingUp className="w-4 h-4 text-primary" />
-              <h3 className="font-semibold">Insights</h3>
+              <h3 className="font-semibold">Resumo</h3>
             </div>
             
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>• Sua rota mais frequente: CI → Manaíra Shopping</p>
-              <p>• Horário preferido: 18:00 - 19:00</p>
-              <p>• Economia de combustível: R$ 156 este mês</p>
+              <p>• Total de viagens realizadas: {stats.totalRides}</p>
+              <p>• Pessoas transportadas: {stats.totalPassengers}</p>
+              <p>• Valor arrecadado: R$ {stats.totalEarnings}</p>
             </div>
           </div>
         )}

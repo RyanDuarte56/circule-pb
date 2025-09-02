@@ -11,8 +11,7 @@ import Register from "./pages/Register";
 import UserTypeSelection from "./pages/UserTypeSelection";
 import EmailVerification from "./pages/EmailVerification";
 import DriverSetup from "./pages/DriverSetup";
-import DriverCRLV from "./pages/DriverCRLV";
-import DriverCNH from "./pages/DriverCNH";
+
 import Menu from "./pages/Menu";
 import Profile from "./pages/Profile";
 import RequestRide from "./pages/RequestRide";
@@ -24,6 +23,9 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import RideHistory from "./pages/RideHistory";
 import TrackRide from "./pages/TrackRide";
+import FavoriteRoute from "./pages/FavoriteRoute";
+import RateUser from "./pages/RateUser";
+import UserRatings from "./pages/UserRatings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +37,12 @@ const App = () => (
         <RidesProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
             <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
@@ -43,8 +50,7 @@ const App = () => (
             <Route path="/user-type-selection" element={<UserTypeSelection />} />
             <Route path="/email-verification" element={<EmailVerification />} />
             <Route path="/driver-setup" element={<DriverSetup />} />
-            <Route path="/driver-crlv" element={<DriverCRLV />} />
-            <Route path="/driver-cnh" element={<DriverCNH />} />
+
             <Route path="/menu" element={<Menu />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/request-ride" element={<RequestRide />} />
@@ -56,6 +62,9 @@ const App = () => (
             <Route path="/help" element={<Help />} />
         <Route path="/ride-history" element={<RideHistory />} />
         <Route path="/track-ride/:rideId" element={<TrackRide />} />
+        <Route path="/favorite-routes" element={<FavoriteRoute />} />
+        <Route path="/rate-user/:userId" element={<RateUser />} />
+        <Route path="/user-ratings/:userId?" element={<UserRatings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

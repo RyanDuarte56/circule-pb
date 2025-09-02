@@ -12,16 +12,51 @@ import heroBanner from '@/assets/hero-banner.png';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/user-type-selection?from=login');
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      // Verificar se há preferências salvas
+      const skipNextTime = localStorage.getItem('skipUserTypeSelection') === 'true';
+      const defaultUserType = localStorage.getItem('defaultUserType');
+      
+      if (skipNextTime && defaultUserType) {
+        // Fazer login direto com o tipo padrão
+        login(email, password, defaultUserType === 'driver');
+        navigate('/menu');
+      } else {
+        // Validar credenciais primeiro
+        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+        const foundUser = users.find((u: any) => u.email === email);
+        
+        if (!foundUser) {
+          throw new Error('Usuário não encontrado. Verifique o email ou cadastre-se.');
+        }
+        
+        const userPasswords = JSON.parse(localStorage.getItem('userPasswords') || '{}');
+        if (userPasswords[foundUser.id] !== password) {
+          throw new Error('Senha incorreta.');
+        }
+        
+        // Ir para seleção de tipo com dados validados
+        navigate(`/user-type-selection?from=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Erro ao fazer login.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
-    navigate('/user-type-selection?from=login');
+    setError('Login com Google não está disponível no momento. Use o cadastro tradicional.');
   };
 
   return (
@@ -52,6 +87,13 @@ const Login = () => {
             <p className="text-sm opacity-90">Conectando a comunidade do CI</p>
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
 
         {/* Login Form */}
         <form onSubmit={handleLogin} className="flex-1 space-y-4">
@@ -91,8 +133,9 @@ const Login = () => {
             <Button 
               type="submit" 
               className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
+              disabled={isLoading}
             >
-              Entrar
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
 
             <Button 
@@ -107,7 +150,7 @@ const Login = () => {
 
             <div className="text-center">
               <Link 
-                to="/user-type-selection?from=register" 
+                to="/register" 
                 className="text-primary hover:text-primary-glow transition-colors"
               >
                 Não tem conta? Cadastre-se

@@ -12,13 +12,18 @@ import {
   Moon, 
   MapPin, 
   MessageSquare,
-  Car
+  Car,
+  User
 } from 'lucide-react';
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, toggleDriverMode } = useAuth();
 
   if (!user) return null;
+
+  const handleToggleDriverMode = () => {
+    toggleDriverMode();
+  };
 
   return (
     <MobileLayout>
@@ -89,6 +94,30 @@ const Settings = () => {
                   <p className="text-xs text-muted-foreground">Durante a viagem</p>
                 </div>
                 <Switch id="location-sharing" defaultChecked />
+              </div>
+            </div>
+          </div>
+
+          {/* User Type Settings */}
+          <div className="bg-gradient-card rounded-xl p-4 shadow-card border">
+            <div className="flex items-center space-x-3 mb-4">
+              <User className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold">Tipo de Usuário</h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="driver-mode">Modo Motorista</Label>
+                  <p className="text-xs text-muted-foreground">
+                    {user.isDriver ? 'Você oferece caronas' : 'Você pede caronas'}
+                  </p>
+                </div>
+                <Switch 
+                  id="driver-mode" 
+                  checked={user.isDriver}
+                  onCheckedChange={handleToggleDriverMode}
+                />
               </div>
             </div>
           </div>
