@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { RidesProvider } from "@/contexts/RidesContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -19,6 +20,9 @@ import OfferRide from "./pages/OfferRide";
 import RideConfirmation from "./pages/RideConfirmation";
 import RidesList from "./pages/RidesList";
 import Chat from "./pages/Chat";
+import Settings from "./pages/Settings";
+import Help from "./pages/Help";
+import RideHistory from "./pages/RideHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,10 +31,11 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
+        <RidesProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -46,10 +51,14 @@ const App = () => (
             <Route path="/ride-confirmation" element={<RideConfirmation />} />
             <Route path="/rides" element={<RidesList />} />
             <Route path="/chat/:rideId" element={<Chat />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/ride-history" element={<RideHistory />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </RidesProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileLayout } from '@/components/MobileLayout';
+import { useRides } from '@/contexts/RidesContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { ArrowLeft, Clock, MapPin, Navigation, MessageSquare, DollarSign, Users, Route } from 'lucide-react';
 
 const OfferRide = () => {
@@ -17,10 +19,13 @@ const OfferRide = () => {
     destination: '',
     description: '',
     shareFuel: false,
-    allowDetour: false
+    allowDetour: false,
+    price: ''
   });
   
   const navigate = useNavigate();
+  const { addRide } = useRides();
+  const { user } = useAuth();
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -28,7 +33,26 @@ const OfferRide = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Em produção, enviaria para API
+    if (!user) return;
+
+    addRide({
+      user: {
+        name: user.name,
+        photo: user.photo || '',
+        rating: 4.8,
+        occupation: user.occupation
+      },
+      time: formData.time,
+      departure: formData.departure,
+      destination: formData.destination,
+      description: formData.description,
+      shareFuel: formData.shareFuel,
+      allowDetour: formData.allowDetour,
+      availableSeats: parseInt(formData.seats),
+      price: formData.price ? parseFloat(formData.price) : undefined,
+      vehicle: 'Veículo do usuário' // Em produção viria do perfil
+    });
+
     navigate('/ride-confirmation', { 
       state: { 
         type: 'offer',
@@ -129,7 +153,7 @@ const OfferRide = () => {
             </div>
           </div>
 
-          <div className="space-y-4">
+            <div className="space-y-4">
             <div className="flex items-start space-x-3 bg-gradient-card rounded-lg p-4 border">
               <Checkbox
                 id="shareFuel"
@@ -144,6 +168,21 @@ const OfferRide = () => {
                 <p className="text-xs text-muted-foreground mt-1">
                   Permitir que passageiros contribuam com os custos
                 </p>
+                {formData.shareFuel && (
+                  <div className="mt-3">
+                    <Label htmlFor="price" className="text-xs">Valor sugerido (opcional)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      placeholder="Ex: 5.00"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', e.target.value)}
+                      className="mt-1 h-8 text-sm"
+                      step="0.50"
+                      min="0"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

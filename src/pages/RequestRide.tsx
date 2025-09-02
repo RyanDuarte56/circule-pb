@@ -5,8 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileLayout } from '@/components/MobileLayout';
-import { ArrowLeft, Clock, MapPin, Navigation, MessageSquare, DollarSign } from 'lucide-react';
+import { useRides } from '@/contexts/RidesContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { ArrowLeft, Clock, MapPin, Navigation, MessageSquare, DollarSign, Users } from 'lucide-react';
 
 const RequestRide = () => {
   const [formData, setFormData] = useState({
@@ -14,10 +17,13 @@ const RequestRide = () => {
     departure: '',
     destination: '',
     description: '',
-    shareFuel: false
+    shareFuel: false,
+    requestedSeats: ''
   });
   
   const navigate = useNavigate();
+  const { addRequest } = useRides();
+  const { user } = useAuth();
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -25,7 +31,23 @@ const RequestRide = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Em produção, enviaria para API
+    if (!user) return;
+
+    addRequest({
+      user: {
+        name: user.name,
+        photo: user.photo || '',
+        rating: 4.5,
+        occupation: user.occupation
+      },
+      time: formData.time,
+      departure: formData.departure,
+      destination: formData.destination,
+      description: formData.description,
+      shareFuel: formData.shareFuel,
+      requestedSeats: parseInt(formData.requestedSeats)
+    });
+
     navigate('/ride-confirmation', { 
       state: { 
         type: 'request',
@@ -47,18 +69,38 @@ const RequestRide = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex-1 space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="time">Horário *</Label>
-            <div className="relative">
-              <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="time"
-                type="time"
-                value={formData.time}
-                onChange={(e) => handleInputChange('time', e.target.value)}
-                className="pl-10"
-                required
-              />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="time">Horário *</Label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="time"
+                  type="time"
+                  value={formData.time}
+                  onChange={(e) => handleInputChange('time', e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="seats">Vagas Desejadas *</Label>
+              <Select value={formData.requestedSeats} onValueChange={(value) => handleInputChange('requestedSeats', value)}>
+                <SelectTrigger>
+                  <div className="flex items-center">
+                    <Users className="w-4 h-4 mr-2 text-muted-foreground" />
+                    <SelectValue placeholder="Pessoas" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 pessoa</SelectItem>
+                  <SelectItem value="2">2 pessoas</SelectItem>
+                  <SelectItem value="3">3 pessoas</SelectItem>
+                  <SelectItem value="4">4 pessoas</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

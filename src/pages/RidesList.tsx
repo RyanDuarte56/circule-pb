@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MobileLayout } from '@/components/MobileLayout';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRides } from '@/contexts/RidesContext';
 import { 
   ArrowLeft, 
   Clock, 
@@ -14,77 +16,18 @@ import {
   Users,
   MessageCircle,
   Star,
-  Car
+  Car,
+  Filter,
+  Route,
+  MapIcon
 } from 'lucide-react';
-
-// Mock data
-const mockRides = [
-  {
-    id: '1',
-    user: {
-      name: 'João Santos',
-      photo: '',
-      rating: 4.8,
-      occupation: 'aluno'
-    },
-    time: '18:00',
-    departure: 'CI - Centro de Informática',
-    destination: 'Manaíra Shopping',
-    price: 5,
-    availableSeats: 3,
-    shareFuel: true,
-    vehicle: 'Honda Civic Prata'
-  },
-  {
-    id: '2',
-    user: {
-      name: 'Maria Silva',
-      photo: '',
-      rating: 4.9,
-      occupation: 'professora'
-    },
-    time: '19:30',
-    departure: 'CI - Centro de Informática',
-    destination: 'Cabo Branco',
-    price: 8,
-    availableSeats: 2,
-    shareFuel: true,
-    vehicle: 'Toyota Corolla Branco'
-  }
-];
-
-const mockRequests = [
-  {
-    id: '1',
-    user: {
-      name: 'Ana Costa',
-      photo: '',
-      rating: 4.7,
-      occupation: 'aluna'
-    },
-    time: '17:00',
-    departure: 'CI - Centro de Informática',
-    destination: 'Bessa',
-    shareFuel: true
-  },
-  {
-    id: '2',
-    user: {
-      name: 'Pedro Lima',
-      photo: '',
-      rating: 4.6,
-      occupation: 'funcionário'
-    },
-    time: '19:00',
-    departure: 'CI - Centro de Informática',
-    destination: 'Tambaú',
-    shareFuel: false
-  }
-];
 
 const RidesList = () => {
   const { user } = useAuth();
+  const { rides, requests } = useRides();
   const navigate = useNavigate();
+  const [filterType, setFilterType] = useState<string>('all');
+  const [showMap, setShowMap] = useState(false);
 
   if (!user) return null;
 
@@ -96,8 +39,21 @@ const RidesList = () => {
     navigate(`/chat/${rideId}`);
   };
 
-  const ridesData = user.isDriver ? mockRequests : mockRides;
+  const ridesData = user.isDriver ? requests : rides;
   const isDriverView = user.isDriver;
+
+  const filteredRides = ridesData.filter(ride => {
+    if (filterType === 'all') return true;
+    if (filterType === 'favorite' && isDriverView) {
+      // Simular trajeto favorito: CI → Manaíra
+      return ride.departure.includes('CI') && ride.destination.includes('Manaíra');
+    }
+    if (filterType === 'proximity' && isDriverView) {
+      // Ordenar por proximidade (simulado)
+      return true;
+    }
+    return true;
+  });
 
   return (
     <MobileLayout>
@@ -113,18 +69,63 @@ const RidesList = () => {
         </div>
 
         {/* Filter/Sort */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-sm text-muted-foreground">
-            {ridesData.length} {isDriverView ? 'pedidos encontrados' : 'caronas disponíveis'}
-          </p>
-          <Button variant="outline" size="sm">
-            Filtrar
-          </Button>
+        <div className="space-y-4 mb-6">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {filteredRides.length} {isDriverView ? 'pedidos encontrados' : 'caronas disponíveis'}
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowMap(!showMap)}
+            >
+              <MapIcon className="w-4 h-4 mr-2" />
+              {showMap ? 'Lista' : 'Mapa'}
+            </Button>
+          </div>
+
+          {/* Filters for Driver */}
+          {isDriverView && (
+            <div className="flex items-center space-x-3">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Filtrar pedidos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os pedidos</SelectItem>
+                  <SelectItem value="favorite">Trajeto favorito</SelectItem>
+                  <SelectItem value="proximity">Por proximidade</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Map View (placeholder) */}
+          {showMap && (
+            <div className="bg-gradient-card rounded-xl p-6 shadow-card border">
+              <div className="flex items-center justify-center space-x-2 text-muted-foreground mb-4">
+                <Route className="w-5 h-5" />
+                <span className="font-medium">Mapa da Rota</span>
+              </div>
+              <div className="bg-muted rounded-lg h-48 flex items-center justify-center">
+                <div className="text-center">
+                  <MapIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm text-muted-foreground">
+                    Visualização do mapa em desenvolvimento
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Rota: CI → Manaíra Shopping via BR-230
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Rides List */}
         <div className="space-y-4 flex-1">
-          {ridesData.map((ride) => (
+          {filteredRides.map((ride) => (
             <div key={ride.id} className="bg-gradient-card rounded-xl p-4 shadow-card border">
               {/* User Info */}
               <div className="flex items-center justify-between mb-3">
@@ -186,6 +187,15 @@ const RidesList = () => {
                     <div className="flex items-center space-x-1 text-sm">
                       <Users className="w-4 h-4 text-muted-foreground" />
                       <span>{(ride as any).availableSeats} vagas</span>
+                    </div>
+                  )}
+                  
+                  {isDriverView && 'requestedSeats' in ride && (
+                    <div className="flex items-center space-x-1 text-sm bg-accent/10 px-2 py-1 rounded-md">
+                      <Users className="w-4 h-4 text-accent" />
+                      <span className="font-medium text-accent">
+                        {(ride as any).requestedSeats} {(ride as any).requestedSeats === 1 ? 'vaga' : 'vagas'}
+                      </span>
                     </div>
                   )}
                   
