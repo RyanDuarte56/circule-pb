@@ -23,6 +23,7 @@ import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import RideHistory from "./pages/RideHistory";
+import TrackRide from "./pages/TrackRide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,7 +54,8 @@ const App = () => (
             <Route path="/chat/:rideId" element={<Chat />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/help" element={<Help />} />
-            <Route path="/ride-history" element={<RideHistory />} />
+        <Route path="/ride-history" element={<RideHistory />} />
+        <Route path="/track-ride/:rideId" element={<TrackRide />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -39,7 +39,9 @@ const RidesList = () => {
     navigate(`/chat/${rideId}`);
   };
 
-  const ridesData = user.isDriver ? requests : rides;
+  // Motorista vê suas próprias caronas oferecidas + pedidos de passageiros
+  // Passageiro vê caronas oferecidas por motoristas
+  const ridesData = user.isDriver ? [...rides.filter(ride => ride.user.name === user.name), ...requests] : rides;
   const isDriverView = user.isDriver;
 
   const filteredRides = ridesData.filter(ride => {
@@ -214,13 +216,26 @@ const RidesList = () => {
               </div>
 
               {/* Action Button */}
-              <Button 
-                onClick={() => handleChatClick(ride.id)}
-                className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                {isDriverView ? 'Responder Pedido' : 'Conversar'}
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  onClick={() => handleChatClick(ride.id)}
+                  className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  {isDriverView ? 'Responder Pedido' : 'Conversar'}
+                </Button>
+                
+                {/* Botão Confirmar/Acompanhar para Passageiros */}
+                {!isDriverView && (
+                  <Button 
+                    onClick={() => navigate(`/track-ride/${ride.id}`)}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Confirmar Carona
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </div>
