@@ -30,7 +30,7 @@ const RideConfirmation = () => {
     return (
       <MobileLayout>
         <div className="flex flex-col items-center justify-center min-h-screen p-6">
-          <p>Dados da carona não encontrados</p>
+          <p>Dados da corrida não encontrados</p>
           <Link to="/menu">
             <Button className="mt-4">Voltar ao Menu</Button>
           </Link>
@@ -59,13 +59,13 @@ const RideConfirmation = () => {
           {/* Title */}
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-foreground">
-              {isOffer ? 'Carona Oferecida!' : isConfirmed ? 'Carona Confirmada!' : 'Carona Solicitada!'}
+              {isOffer ? 'Corrida Oferecida!' : isConfirmed ? 'Corrida Confirmada!' : 'Corrida Solicitada!'}
             </h1>
             <p className="text-muted-foreground">
               {isOffer 
-                ? 'Sua carona foi adicionada com sucesso. Os passageiros poderão vê-la na lista.'
+                ? 'Sua corrida foi adicionada com sucesso. Os passageiros poderão vê-la na lista.'
                 : isConfirmed
-                ? 'Sua carona foi confirmada! Agora você pode acompanhar o trajeto em tempo real.'
+                ? 'Sua corrida foi confirmada! Agora você pode acompanhar o trajeto em tempo real.'
                 : 'Sua solicitação foi enviada. Os motoristas poderão vê-la e entrar em contato.'
               }
             </p>
@@ -175,7 +175,7 @@ const RideConfirmation = () => {
               <>
                 <Link to="/rides" className="block">
                   <Button className="w-full bg-gradient-primary hover:shadow-glow">
-                    Ver {isOffer ? 'Minhas Caronas' : 'Caronas Disponíveis'}
+                    Ver {isOffer ? 'Minhas Corridas' : 'Corridas Disponíveis'}
                   </Button>
                 </Link>
                 

@@ -76,7 +76,7 @@ const FavoriteRoute = () => {
   };
 
   const handleUseRoute = (route: FavoriteRouteData) => {
-    // Navegar para a tela de pedido de carona com os dados preenchidos
+    // Navegar para a tela de pedido de corrida com os dados preenchidos
     navigate('/request-ride', {
       state: {
         departure: route.departure,
@@ -99,7 +99,7 @@ const FavoriteRoute = () => {
         </div>
 
         <p className="text-sm text-muted-foreground mb-6">
-          Salve suas rotas mais utilizadas para facilitar futuras solicitações de carona.
+          Salve suas rotas mais utilizadas para facilitar futuras solicitações de corrida.
         </p>
 
         {/* Add New Route Form */}

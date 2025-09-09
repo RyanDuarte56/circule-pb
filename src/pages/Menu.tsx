@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MobileLayout } from '@/components/MobileLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,9 +11,136 @@ import {
   Car,
   Users,
   LogOut,
-  Star
+  Star,
+  Bell,
+  X
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import circularLogo from '@/assets/circular-logo.png';
+
+// Componente de Notificação com Sino
+const NotificationBell = () => {
+  const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: 'accept', message: 'Sua corrida foi aceita!', time: '2 min atrás', read: false },
+    { id: 2, type: 'cancel', message: 'Uma corrida foi cancelada.', time: '5 min atrás', read: false },
+    { id: 3, type: 'similar', message: 'Há um pedido de corrida similar à sua rota desejada.', time: '10 min atrás', read: false },
+    { id: 4, type: 'request', message: 'Novo pedido de corrida disponível.', time: '15 min atrás', read: false },
+    { id: 5, type: 'offer', message: 'Nova corrida oferecida disponível.', time: '20 min atrás', read: false }
+  ]);
+  
+  // Atualiza o estado do diálogo
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+  };
+  
+  // Marca uma notificação como lida
+  const markAsRead = (id: number) => {
+    setNotifications(notifications.map(notification => 
+      notification.id === id ? { ...notification, read: true } : notification
+    ));
+  };
+  
+  // Marca todas as notificações como lidas
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(notification => ({ ...notification, read: true })));
+  };
+  
+  // Limpa todas as notificações
+  const clearAllNotifications = () => {
+    setNotifications([]);
+  };
+  
+  // Conta notificações não lidas
+  const unreadCount = notifications.filter(notification => !notification.read).length;
+  
+  // Função para obter o ícone baseado no tipo de notificação
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'accept':
+        return <div className="bg-green-100 p-2 rounded-full"><Car className="h-4 w-4 text-green-600" /></div>;
+      case 'cancel':
+        return <div className="bg-red-100 p-2 rounded-full"><X className="h-4 w-4 text-red-600" /></div>;
+      case 'similar':
+        return <div className="bg-blue-100 p-2 rounded-full"><Users className="h-4 w-4 text-blue-600" /></div>;
+      case 'request':
+        return <div className="bg-amber-100 p-2 rounded-full"><User className="h-4 w-4 text-amber-600" /></div>;
+      case 'offer':
+        return <div className="bg-purple-100 p-2 rounded-full"><Car className="h-4 w-4 text-purple-600" /></div>;
+      default:
+        return <div className="bg-gray-100 p-2 rounded-full"><Bell className="h-4 w-4 text-gray-600" /></div>;
+    }
+  };
+  
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <div className="cursor-pointer">
+          <div className="relative">
+            <div className="bg-primary/10 p-2 rounded-full hover:bg-primary/20 transition-colors">
+              <Bell className="h-5 w-5 text-primary" />
+            </div>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-sm animate-pulse">
+                {unreadCount}
+              </span>
+            )}
+          </div>
+        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+             <DialogTitle className="text-center text-xl font-bold">Notificações</DialogTitle>
+             {notifications.length > 0 && (
+               <div className="flex justify-between mt-2">
+                 <button 
+                   onClick={(e) => { e.stopPropagation(); markAllAsRead(); }}
+                   className="text-xs text-blue-500 hover:text-blue-700 transition-colors"
+                 >
+                   Marcar todas como lidas
+                 </button>
+                 <button 
+                   onClick={(e) => { e.stopPropagation(); clearAllNotifications(); }}
+                   className="text-xs text-red-500 hover:text-red-700 transition-colors"
+                 >
+                   Limpar todas
+                 </button>
+               </div>
+             )}
+           </DialogHeader>
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+            {notifications.map((notification) => (
+              <div 
+                key={notification.id} 
+                className={`flex items-center space-x-3 p-4 rounded-lg border transition-colors cursor-pointer ${notification.read ? 'bg-muted/5 opacity-70' : 'bg-muted/10 hover:bg-muted/20'}`}
+                onClick={() => markAsRead(notification.id)}
+              >
+                {getNotificationIcon(notification.type)}
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <p className={`font-medium ${notification.read ? '' : 'font-semibold'}`}>{notification.message}</p>
+                    {!notification.read && <div className="h-2 w-2 rounded-full bg-blue-500"></div>}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">{notification.time}</p>
+                </div>
+              </div>
+            ))}
+            {notifications.length === 0 && (
+              <div className="text-center p-4 text-muted-foreground">
+                Nenhuma notificação disponível
+              </div>
+            )}
+          </div>
+        </DialogContent>
+    </Dialog>
+  );
+};
 
 const Menu = () => {
   const { user, logout } = useAuth();
@@ -39,9 +166,14 @@ const Menu = () => {
       <div className="flex flex-col min-h-screen space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <img src={circularLogo} alt="Circular" className="w-12 h-12" />
-            <h1 className="text-2xl font-bold text-gradient">Circular</h1>
+          <div className="flex items-center justify-center relative mb-4">
+            <div className="flex items-center space-x-3">
+              <img src={circularLogo} alt="Circular" className="w-12 h-12" />
+              <h1 className="text-2xl font-bold text-gradient">Circular</h1>
+            </div>
+            <div className="absolute right-0">
+              <NotificationBell />
+            </div>
           </div>
           <h2 className="text-xl font-bold mb-2">
             Olá, {user.name.split(' ')[0]}! 👋
@@ -62,16 +194,16 @@ const Menu = () => {
                   <List className="w-6 h-6 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-base mb-1">Listar Caronas</h3>
+                  <h3 className="font-semibold text-base mb-1">Listar Corridas</h3>
                   <p className="text-sm text-muted-foreground">
-                    {user.isDriver ? 'Ver pedidos de carona' : 'Encontrar caronas disponíveis'}
+                    {user.isDriver ? 'Ver pedidos de corrida' : 'Encontrar corridas disponíveis'}
                   </p>
                 </div>
               </div>
             </div>
           </Link>
 
-          {/* Oferecer/Pedir Carona */}
+          {/* Oferecer/Pedir Corrida */}
           <Link to={user.isDriver ? "/offer-ride" : "/request-ride"} className="group block">
             <div className="bg-gradient-card rounded-xl p-4 shadow-card border hover:shadow-glow transition-all duration-300 group-hover:scale-[1.02]">
               <div className="flex items-center space-x-4">
@@ -80,10 +212,10 @@ const Menu = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-base mb-1">
-                    {user.isDriver ? 'Oferecer Carona' : 'Pedir Carona'}
+                    {user.isDriver ? 'Oferecer Corrida' : 'Pedir Corrida'}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {user.isDriver ? 'Disponibilizar vagas no seu carro' : 'Solicitar uma carona'}
+                    {user.isDriver ? 'Disponibilizar vagas no seu carro' : 'Solicitar uma corrida'}
                   </p>
                 </div>
               </div>

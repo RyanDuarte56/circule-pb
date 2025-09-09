@@ -137,7 +137,7 @@ const RateUser = () => {
           </div>
           
           <p className="text-sm text-muted-foreground">
-            Como foi sua experiência compartilhando uma carona com {userToRate.name.split(' ')[0]}?
+            Como foi sua experiência compartilhando uma corrida com {userToRate.name.split(' ')[0]}?
           </p>
         </div>
 

@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const DriverSetup = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [step, setStep] = useState(1);
   const [vehicleData, setVehicleData] = useState({
     brand: '',
@@ -45,9 +45,9 @@ const DriverSetup = () => {
       setError('');
       setStep(2);
     } else if (step === 2) {
-      // Validar documentos
-      if (!cnhFile || !crlvFile) {
-        setError('Envie ambos os documentos (CNH e CRLV).');
+      // Validar documentos - verificar se pelo menos um arquivo foi enviado
+      if (!cnhFile && !crlvFile) {
+        setError('Envie pelo menos um documento (CNH ou CRLV).');
         return;
       }
       handleSubmit();
@@ -62,31 +62,52 @@ const DriverSetup = () => {
       
       // Atualizar usuário para ter perfil de motorista
       if (user) {
-        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        const updatedUsers = users.map((u: any) => {
-          if (u.id === user.id) {
-            return {
-              ...u,
-              hasDriverProfile: true,
-              isDriver: true,
-              vehicleData,
-              cnhDocument: cnhFile?.name,
-              crlvDocument: crlvFile?.name
-            };
-          }
-          return u;
-        });
-        localStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+        // Criar perfil de motorista
+        const driverProfile = {
+          vehicleData,
+          cnhDocument: cnhFile?.name || '',
+          crlvDocument: crlvFile?.name || ''
+        };
         
+        // Salvar perfil de motorista no localStorage
+        localStorage.setItem(`driver_${user.id}`, JSON.stringify(driverProfile));
+        
+        // Atualizar perfil ativo
+        localStorage.setItem(`activeProfile_${user.id}`, 'driver');
+        
+        // Atualizar o contexto de autenticação
         const updatedUser = {
           ...user,
           hasDriverProfile: true,
           isDriver: true,
-          vehicleData,
-          cnhDocument: cnhFile?.name,
-          crlvDocument: crlvFile?.name
+          driverProfile
         };
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        
+        // Atualizar o estado do usuário no localStorage
+        localStorage.setItem(`user_${user.id}`, JSON.stringify({
+          ...user,
+          hasDriverProfile: true
+        }));
+        
+        // Não usar toggleDriverMode pois ele alterna o modo atual, e queremos definir diretamente como motorista
+        // Em vez disso, atualizamos diretamente o estado do usuário
+        
+        // Recarregar os perfis específicos para garantir que temos os dados mais recentes
+        const driverProfileData = localStorage.getItem(`driver_${user.id}`);
+        const passengerProfileData = localStorage.getItem(`passenger_${user.id}`);
+        
+        // Atualizar estado local com todos os dados atualizados
+        const completeUser = { 
+          ...user, 
+          isDriver: true,
+          hasDriverProfile: true,
+          hasPassengerProfile: !!passengerProfileData,
+          driverProfile: driverProfileData ? JSON.parse(driverProfileData) : undefined,
+          passengerProfile: passengerProfileData ? JSON.parse(passengerProfileData) : undefined
+        };
+        
+        // Atualizar o estado do usuário no contexto
+        setUser(completeUser);
       }
       
       navigate('/menu');

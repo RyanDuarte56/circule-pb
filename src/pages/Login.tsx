@@ -32,16 +32,17 @@ const Login = () => {
         login(email, password, defaultUserType === 'driver');
         navigate('/menu');
       } else {
-        // Validar credenciais primeiro
-        const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-        const foundUser = users.find((u: any) => u.email === email);
+        // Validar se o email existe
+        const userEmails = JSON.parse(localStorage.getItem('userEmails') || '{}');
+        const userId = userEmails[email];
         
-        if (!foundUser) {
+        if (!userId) {
           throw new Error('Usuário não encontrado. Verifique o email ou cadastre-se.');
         }
         
+        // Verificar senha
         const userPasswords = JSON.parse(localStorage.getItem('userPasswords') || '{}');
-        if (userPasswords[foundUser.id] !== password) {
+        if (userPasswords[userId] !== password) {
           throw new Error('Senha incorreta.');
         }
         

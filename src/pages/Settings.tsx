@@ -64,8 +64,8 @@ const Settings = () => {
               
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="ride-updates">Atualizações de Carona</Label>
-                  <p className="text-xs text-muted-foreground">Avisos sobre suas caronas</p>
+                  <Label htmlFor="ride-updates">Atualizações de Corrida</Label>
+                  <p className="text-xs text-muted-foreground">Avisos sobre suas corridas</p>
                 </div>
                 <Switch id="ride-updates" defaultChecked />
               </div>
@@ -110,7 +110,7 @@ const Settings = () => {
                 <div>
                   <Label htmlFor="driver-mode">Modo Motorista</Label>
                   <p className="text-xs text-muted-foreground">
-                    {user.isDriver ? 'Você oferece caronas' : 'Você pede caronas'}
+                    {user.isDriver ? 'Você oferece corridas' : 'Você pede corridas'}
                   </p>
                 </div>
                 <Switch 

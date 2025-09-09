@@ -26,19 +26,19 @@ const Chat = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [rideConfirmed, setRideConfirmed] = useState(false);
   
-  // Encontrar a carona
+  // Encontrar a corrida
   const ride = [...rides, ...requests].find(r => r.id === rideId);
   
   if (!ride || !user) {
     return (
       <MobileLayout>
         <div className="text-center py-12">
-          <h3 className="text-lg font-semibold mb-2">Carona não encontrada</h3>
+          <h3 className="text-lg font-semibold mb-2">Corrida não encontrada</h3>
           <p className="text-muted-foreground mb-6">
             Esta conversa não está mais disponível
           </p>
           <Link to="/rides-list">
-            <Button>Voltar às Caronas</Button>
+            <Button>Voltar às Corridas</Button>
           </Link>
         </div>
       </MobileLayout>
@@ -124,7 +124,7 @@ const Chat = () => {
               <div className="text-muted-foreground mb-4">
                 <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
                 <p>Nenhuma mensagem ainda</p>
-                <p className="text-sm">Inicie uma conversa sobre a carona</p>
+                <p className="text-sm">Inicie uma conversa sobre a corrida</p>
               </div>
             </div>
           ) : (
@@ -170,7 +170,7 @@ const Chat = () => {
           <div className="p-4 bg-secondary/10 border-t">
             <div className="flex items-center justify-center space-x-2 text-secondary">
               <CheckCircle className="w-5 h-5" />
-              <span className="font-medium">Carona confirmada!</span>
+              <span className="font-medium">Corrida confirmada!</span>
             </div>
           </div>
         )}

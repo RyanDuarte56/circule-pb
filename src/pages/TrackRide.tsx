@@ -29,10 +29,10 @@ const TrackRide = () => {
 
   const [estimatedTime, setEstimatedTime] = useState(12);
 
-  // Dados da carona podem vir via state ou buscar na lista
+  // Dados da corrida podem vir via state ou buscar na lista
   const rideData = location.state || rides.find(r => r.id === rideId);
   
-  // Se não encontrar a carona, redirecionar
+  // Se não encontrar a corrida, redirecionar
   if (!rideData) {
     navigate('/rides-list');
     return null;
@@ -79,7 +79,7 @@ const TrackRide = () => {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className="text-xl font-semibold ml-4">
-            {isTracking ? 'Acompanhar Carona' : 'Detalhes da Carona'}
+            {isTracking ? 'Acompanhar Corrida' : 'Detalhes da Corrida'}
           </h1>
         </div>
 
@@ -217,12 +217,12 @@ const TrackRide = () => {
               variant="destructive"
               className="w-full"
               onClick={() => {
-                if (confirm('Tem certeza que deseja cancelar esta carona?')) {
+                if (confirm('Tem certeza que deseja cancelar esta corrida?')) {
                   navigate('/rides');
                 }
               }}
             >
-              Cancelar Carona
+              Cancelar Corrida
             </Button>
           </div>
           

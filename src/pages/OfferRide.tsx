@@ -69,7 +69,7 @@ const OfferRide = () => {
           <Link to="/menu" className="p-2 -ml-2">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-xl font-semibold ml-4">Oferecer Carona</h1>
+          <h1 className="text-xl font-semibold ml-4">Oferecer Corrida</h1>
         </div>
 
         {/* Form */}
@@ -208,13 +208,13 @@ const OfferRide = () => {
             type="submit" 
             className="w-full bg-secondary hover:bg-secondary/90 transition-all duration-300 mt-8"
           >
-            Adicionar Carona
+            Adicionar Corrida
           </Button>
         </form>
 
         {/* Tips */}
         <div className="bg-muted rounded-lg p-4 mt-6">
-          <h3 className="font-medium mb-2">🚗 Dicas para oferecer carona:</h3>
+          <h3 className="font-medium mb-2">🚗 Dicas para oferecer corrida:</h3>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Confirme o local e horário com antecedência</li>
             <li>• Mantenha seu veículo limpo e seguro</li>

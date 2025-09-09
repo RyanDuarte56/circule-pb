@@ -17,16 +17,18 @@ import {
   MessageCircle,
   Star,
   Car,
-  Filter
+  Filter,
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
 const RidesList = () => {
   const { user } = useAuth();
-  const { rides, requests } = useRides();
+  const { rides, requests, cancelRequest, cancelRide } = useRides();
   const navigate = useNavigate();
   const [filterType, setFilterType] = useState<string>('all');
-
   const [sortBy, setSortBy] = useState<string>('time');
+  const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
 
   if (!user) return null;
 
@@ -38,17 +40,37 @@ const RidesList = () => {
     navigate(`/chat/${rideId}`);
   };
 
-  // Motorista vê suas próprias caronas oferecidas + pedidos de passageiros
-  // Passageiro vê caronas oferecidas por motoristas
-  const ridesData = user.isDriver ? [...rides, ...requests] : rides.filter(ride => ride.user.name !== user.name);
+  // Motorista vê suas próprias corridas oferecidas + pedidos de passageiros
+  // Passageiro vê todas as corridas oferecidas por motoristas (incluindo as próprias) + seus próprios pedidos
+  const ridesData = user.isDriver 
+    ? [...rides, ...requests] 
+    : [...rides, ...requests.filter(req => req.user.name === user.name)];
+  
+  // Identificar se cada item é uma corrida oferecida ou um pedido
+  const isRideOffer = (ride: any) => rides.some(r => r.id === ride.id);
   const isDriverView = user.isDriver;
+  
+  // Função para verificar se o pedido é do usuário atual (em qualquer perfil)
+  const isUserRequest = (ride: any) => ride.user.name === user.name;
+  
+  // Função para verificar se o pedido é do usuário atual como passageiro
+  const isUserPassengerRequest = (ride: any) => !user.isDriver && ride.user.name === user.name && !isRideOffer(ride);
+  
+  // Função para verificar se o pedido é do mesmo usuário, mas está no perfil de motorista
+  const isSameUserDifferentProfile = (ride: any) => user.isDriver && ride.user.name === user.name && !isRideOffer(ride);
+  
+  // Função para verificar se é uma corrida do próprio motorista
+  const isUserDriverOffer = (ride: any) => user.isDriver && ride.user.name === user.name && isRideOffer(ride);
+  
+  // Função para verificar se é uma corrida do próprio usuário quando está no perfil de passageiro
+  const isUserPassengerViewingOwnRideOffer = (ride: any) => !user.isDriver && ride.user.name === user.name && isRideOffer(ride);
 
 
 
   const filteredRides = ridesData.filter(ride => {
     if (filterType === 'all') return true;
     if (filterType === 'price') {
-      // Filtrar caronas com preço (que dividem combustível)
+      // Filtrar corridas com preço (que dividem combustível)
       return ride.shareFuel;
     }
     return true;
@@ -82,7 +104,7 @@ const RidesList = () => {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className="text-xl font-semibold ml-4">
-            {isDriverView ? 'Pedidos de Carona' : 'Caronas Disponíveis'}
+            {isDriverView ? 'Pedidos de Carona' : 'Corridas Disponíveis'}
           </h1>
         </div>
 
@@ -90,7 +112,7 @@ const RidesList = () => {
         <div className="space-y-4 mb-6">
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              {filteredRides.length} {isDriverView ? 'pedidos encontrados' : 'caronas disponíveis'}
+              {filteredRides.length} {isDriverView ? 'pedidos encontrados' : 'corridas disponíveis'}
             </p>
 
           </div>
@@ -100,10 +122,10 @@ const RidesList = () => {
             <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger className="w-48">
-                <SelectValue placeholder={isDriverView ? "Filtrar pedidos" : "Filtrar caronas"} />
+                <SelectValue placeholder={isDriverView ? "Filtrar pedidos" : "Filtrar corridas"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{isDriverView ? 'Todos os pedidos' : 'Todas as caronas'}</SelectItem>
+                <SelectItem value="all">{isDriverView ? 'Todos os pedidos' : 'Todas as corridas'}</SelectItem>
                 {!isDriverView && <SelectItem value="price">Com preço</SelectItem>}
               </SelectContent>
             </Select>
@@ -130,7 +152,7 @@ const RidesList = () => {
               <div className="bg-muted rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Car className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="font-medium mb-2">Nenhuma carona encontrada</h3>
+              <h3 className="font-medium mb-2">Nenhuma corrida encontrada</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Tente ajustar os filtros ou criar uma nova {isDriverView ? 'oferta' : 'solicitação'}
               </p>
@@ -147,7 +169,7 @@ const RidesList = () => {
             </div>
           ) : (
             sortedRides.map((ride) => (
-            <div key={ride.id} className="bg-gradient-card rounded-xl p-4 shadow-card border">
+            <div key={ride.id} className={`bg-gradient-card rounded-xl p-4 shadow-card border ${isUserPassengerRequest(ride) ? 'border-primary border-2' : ''} ${isSameUserDifferentProfile(ride) ? 'border-amber-500 border-2' : ''} ${isUserDriverOffer(ride) ? 'border-green-500 border-2' : ''} ${isUserPassengerViewingOwnRideOffer(ride) ? 'border-green-500 border-2' : ''}`}>
               {/* User Info */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
@@ -234,18 +256,164 @@ const RidesList = () => {
                 </div>
               </div>
 
+              {/* Indicador de pedido próprio */}
+              {isUserPassengerRequest(ride) && (
+                <div className="mb-3 bg-primary/10 p-2 rounded-md text-sm text-primary flex items-center space-x-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="font-medium">Seu pedido de corrida</span>
+                </div>
+              )}
+              
+              {/* Aviso quando o usuário está no perfil de motorista e tem um pedido ativo como passageiro */}
+              {isSameUserDifferentProfile(ride) && (
+                <div className="mb-3 bg-amber-500/20 p-2 rounded-md text-sm text-amber-600 flex items-center space-x-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span className="font-medium">Você está no perfil de motorista e tem uma corrida ativa no perfil de passageiro</span>
+                </div>
+              )}
+              
+              {/* Indicador de corrida própria quando está no perfil de motorista */}
+              {isUserDriverOffer(ride) && (
+                <div className="mb-3 bg-green-500/20 p-2 rounded-md text-sm text-green-600 flex items-center space-x-2">
+                  <Car className="w-4 h-4" />
+                  <span className="font-medium">Sua corrida</span>
+                </div>
+              )}
+              
+              {/* Indicador de corrida própria quando está no perfil de passageiro */}
+              {isUserPassengerViewingOwnRideOffer(ride) && (
+                <div className="mb-3 bg-green-500/20 p-2 rounded-md text-sm text-green-600 flex items-center space-x-2">
+                  <Car className="w-4 h-4" />
+                  <span className="font-medium">Você está no perfil de passageiro e tem uma corrida ativa no perfil de motorista</span>
+                </div>
+              )}
+
               {/* Action Button */}
               <div className="space-y-2">
-                <Button 
-                  onClick={() => handleChatClick(ride.id)}
-                  className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  {isDriverView ? 'Responder Pedido' : 'Conversar'}
-                </Button>
+                {isUserPassengerRequest(ride) ? (
+                  cancelConfirmId === ride.id ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-destructive font-medium mb-2">Confirmar cancelamento?</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          onClick={() => {
+                            cancelRequest(ride.id);
+                            setCancelConfirmId(null);
+                          }}
+                          variant="destructive"
+                          size="sm"
+                        >
+                          Sim, cancelar
+                        </Button>
+                        <Button 
+                          onClick={() => setCancelConfirmId(null)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Não
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button 
+                      onClick={() => setCancelConfirmId(ride.id)}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancelar Pedido
+                    </Button>
+                  )
+                ) : isUserDriverOffer(ride) ? (
+                  cancelConfirmId === ride.id ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-destructive font-medium mb-2">Confirmar cancelamento?</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          onClick={() => {
+                            // Usando a função específica para cancelar corridas
+                            cancelRide(ride.id);
+                            setCancelConfirmId(null);
+                          }}
+                          variant="destructive"
+                          size="sm"
+                        >
+                          Sim, cancelar
+                        </Button>
+                        <Button 
+                          onClick={() => setCancelConfirmId(null)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Não
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button 
+                      onClick={() => setCancelConfirmId(ride.id)}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancelar Corrida
+                    </Button>
+                  )
+                ) : isUserPassengerViewingOwnRideOffer(ride) ? (
+                  cancelConfirmId === ride.id ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-destructive font-medium mb-2">Confirmar cancelamento?</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          onClick={() => {
+                            // Usando a função específica para cancelar corridas
+                            cancelRide(ride.id);
+                            setCancelConfirmId(null);
+                          }}
+                          variant="destructive"
+                          size="sm"
+                        >
+                          Sim, cancelar
+                        </Button>
+                        <Button 
+                          onClick={() => setCancelConfirmId(null)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Não
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button 
+                      onClick={() => setCancelConfirmId(ride.id)}
+                      variant="destructive"
+                      className="w-full"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancelar Corrida
+                    </Button>
+                  )
+                ) : isSameUserDifferentProfile(ride) ? (
+                  <Button 
+                    variant="outline"
+                    className="w-full cursor-not-allowed opacity-70"
+                    disabled
+                  >
+                    Não é possível responder seu próprio pedido
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={() => handleChatClick(ride.id)}
+                    className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    {isDriverView ? 'Responder Pedido' : 'Conversar'}
+                  </Button>
+                )}
                 
                 {/* Botão Confirmar Carona para Passageiros */}
-                {!isDriverView && (
+                {!isDriverView && !isUserPassengerRequest(ride) && !isSameUserDifferentProfile(ride) && (
                   <Button 
                     onClick={() => navigate('/ride-confirmation', { 
                       state: { 
@@ -273,7 +441,7 @@ const RidesList = () => {
         <div className="mt-6">
           <Link to={user.isDriver ? "/offer-ride" : "/request-ride"}>
             <Button variant="outline" className="w-full">
-              {user.isDriver ? 'Oferecer Nova Carona' : 'Pedir Nova Carona'}
+              {user.isDriver ? 'Oferecer Nova Corrida' : 'Pedir Nova Carona'}
             </Button>
           </Link>
         </div>

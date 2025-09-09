@@ -26,20 +26,20 @@ const Help = () => {
   const faqData = [
     {
       id: 'cancel-ride',
-      question: 'Quero desistir da carona, como faço?',
-      answer: 'Você pode cancelar sua carona até 30 minutos antes do horário marcado. Acesse "Minhas Caronas" no menu, selecione a carona e toque em "Cancelar". O motorista e outros passageiros serão notificados automaticamente.',
+      question: 'Quero desistir da corrida, como faço?',
+      answer: 'Você pode cancelar sua corrida até 30 minutos antes do horário marcado. Acesse "Minhas Corridas" no menu, selecione a corrida e toque em "Cancelar". O motorista e outros passageiros serão notificados automaticamente.',
       icon: <Clock className="w-4 h-4 text-destructive" />
     },
     {
       id: 'driver-cancel',
       question: 'O que acontece se o motorista cancelar a viagem?',
-      answer: 'Se o motorista cancelar, todos os passageiros serão notificados imediatamente. Você receberá sugestões de caronas alternativas no mesmo horário e rota. Cancelamentos frequentes podem afetar a avaliação do motorista.',
+      answer: 'Se o motorista cancelar, todos os passageiros serão notificados imediatamente. Você receberá sugestões de corridas alternativas no mesmo horário e rota. Cancelamentos frequentes podem afetar a avaliação do motorista.',
       icon: <Car className="w-4 h-4 text-accent" />
     },
     {
       id: 'payment',
-      question: 'Como funciona o pagamento da carona?',
-      answer: 'O pagamento é combinado diretamente entre passageiro e motorista. Pode ser em dinheiro, PIX ou divisão do combustível. O valor é acordado antes da confirmação da carona.',
+      question: 'Como funciona o pagamento da corrida?',
+      answer: 'O pagamento é combinado diretamente entre passageiro e motorista. Pode ser em dinheiro, PIX ou divisão do combustível. O valor é acordado antes da confirmação da corrida.',
       icon: <DollarSign className="w-4 h-4 text-secondary" />
     },
     {

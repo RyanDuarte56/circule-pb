@@ -247,7 +247,7 @@ const Register = () => {
                 <SelectContent>
                   <SelectItem value="aluno">Aluno</SelectItem>
                   <SelectItem value="professor">Professor</SelectItem>
-                  <SelectItem value="funcionario">Funcionário</SelectItem>
+                  <SelectItem value="funcionario">Técnico Administrativo</SelectItem>
                   <SelectItem value="terceirizado">Terceirizado</SelectItem>
                 </SelectContent>
               </Select>

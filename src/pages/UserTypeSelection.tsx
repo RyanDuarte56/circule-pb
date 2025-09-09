@@ -30,13 +30,26 @@ const UserTypeSelection = () => {
     }
     
     if (from === 'register' && email && password) {
-      // Fazer login com os dados do usuário recém-cadastrado
-      try {
-        login(email, password, selectedType === 'driver');
-        navigate('/menu');
-      } catch (error) {
-        console.error('Erro ao fazer login após cadastro:', error);
-        navigate('/login');
+      // Se o usuário selecionou motorista, redirecionar para configuração de motorista
+      if (selectedType === 'driver') {
+        try {
+          // Fazer login como passageiro primeiro
+          login(email, password, false);
+          // Redirecionar para configuração de motorista
+          navigate('/driver-setup');
+        } catch (error) {
+          console.error('Erro ao fazer login após cadastro:', error);
+          navigate('/login');
+        }
+      } else {
+        // Se selecionou passageiro, fazer login normalmente
+        try {
+          login(email, password, false);
+          navigate('/menu');
+        } catch (error) {
+          console.error('Erro ao fazer login após cadastro:', error);
+          navigate('/login');
+        }
       }
     } else if (from === 'login' && email && password) {
       // Fazer login com os dados reais do usuário
@@ -99,7 +112,7 @@ const UserTypeSelection = () => {
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">Passageiro</h3>
                     <p className="text-sm text-muted-foreground">
-                      Procurar caronas oferecidas por motoristas
+                      Procurar corridas oferecidas por motoristas
                     </p>
                   </div>
                   {selectedType === 'passenger' && (
@@ -131,7 +144,7 @@ const UserTypeSelection = () => {
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">Motorista</h3>
                     <p className="text-sm text-muted-foreground">
-                      Oferecer caronas para a comunidade do CI
+                      Oferecer corridas para a comunidade do CI
                     </p>
                   </div>
                   {selectedType === 'driver' && (
@@ -158,7 +171,7 @@ const UserTypeSelection = () => {
                 </>
               ) : (
                 <>
-                  <li>• Oferecer caronas e ajudar colegas</li>
+                  <li>• Oferecer corridas e ajudar colegas</li>
                   <li>• Dividir custos de combustível</li>
                   <li>• Construir uma rede de contatos</li>
                 </>

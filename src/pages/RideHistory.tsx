@@ -123,7 +123,7 @@ const RideHistory = () => {
               </p>
               <Link to={user.isDriver ? "/offer-ride" : "/request-ride"}>
                 <Button>
-                  {user.isDriver ? 'Oferecer Carona' : 'Pedir Carona'}
+                  {user.isDriver ? 'Oferecer Corrida' : 'Pedir Carona'}
                 </Button>
               </Link>
             </div>

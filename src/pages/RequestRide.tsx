@@ -181,13 +181,13 @@ const RequestRide = () => {
             type="submit" 
             className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300 mt-8"
           >
-            Pedir Carona
+            Pedir Corrida
           </Button>
         </form>
 
         {/* Tips */}
         <div className="bg-muted rounded-lg p-4 mt-6">
-          <h3 className="font-medium mb-2">💡 Dicas para conseguir uma carona:</h3>
+          <h3 className="font-medium mb-2">💡 Dicas para conseguir uma corrida:</h3>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Seja flexível com horários</li>
             <li>• Ofereça-se para dividir o combustível</li>
