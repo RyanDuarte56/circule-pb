@@ -197,15 +197,21 @@ const Settings = () => {
         {/* Footer with Team Credit */}
         <div className="mt-8 pt-6 border-t border-border">
           <div className="text-center">
-            <p className="text-xs text-muted-foreground/60 mb-1">
-              Desenvolvido com ❤️ por
-            </p>
             <p className="text-sm font-medium text-muted-foreground/80">
               Equipe Circular - CI/UFPB
             </p>
-            <p className="text-xs text-muted-foreground/50 mt-1">
+            <p className="text-xs text-muted-foreground/50 mt-1 mb-3">
               Versão 1.0.0
             </p>
+            <div className="text-xs text-muted-foreground/70 space-y-1">
+              <p>Vinícius Leite Ferreira Alves</p>
+              <p>Nathan Meira Nóbrega</p>
+              <p>Arthur Vieira Toscano da Silva</p>
+              <p>João Victor Monteiro de Oliveira</p>
+              <p>Kalil de Sousa Figueiredo Gomes Teotonio</p>
+              <p>Ryan Duarte Sarmento Pedrosa</p>
+              <p>Rainer Terroso Carneiro</p>
+            </div>
           </div>
         </div>
       </div>
